@@ -1,3 +1,6 @@
 # Hunting_simulation
-A proyect to simulate the prey - hunter enviroment. I want to see if the environment follows Loka-Volterra equations and if so, if it still follows the equations when not satisfying the L-V assumptions.
-This proyect is entirely done in python.
+A proyect to simulate the prey - hunter enviroment. This proyect is entirely done in python. I will try to describe the following:
+
+- Gen development
+- Competition
+- Population growth described with Lotka-Volterra equations
