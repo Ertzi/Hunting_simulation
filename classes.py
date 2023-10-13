@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 from PIL import Image
 import os
-from helper import move
+from matplotlib.animation import PillowWriter
+from helper import uniform_line
 import numpy as np
 
 class Rabbit:
@@ -70,7 +71,7 @@ class Environment:
     
   def execute_environment(self,print_it = False):
     """
-    Executes the simulation
+    Executes the simulation.
     """
     for i in range(1, self.n_iterations + 1):
       for rabbit in self.rabbits:
@@ -79,17 +80,41 @@ class Environment:
       for i in range(len(self.rabbits)):
         print(f"Rabbit {i}  position: \n{self.rabbits[i].positions}")
 
+  def animate_the_simulation(self,n_frames):
+    transitions = []
+    q = self.get_coordinates_per_iteration()
+    for j in range(self.n_iterations):
+      r = []
+      for i in range(len(self.rabbits)):# n_rabbits may change! use np.nan to handle it
+        r.append(uniform_line(q[j,0,i],q[j,1,i],q[j+1,0,i],q[j+1,1,i],n_frames))
+      transition = np.dstack(r)
+      transitions.append(transition)
+    fig = plt.figure()
+    l, = plt.plot([],[],"ro")
+    plt.xlim(self.x_min,self.x_max)
+    plt.ylim(self.y_min,self.y_max)
+    plt.grid()
+
+    metadata = dict(title= "Movie", artist = "codinglikemad")
+    writer = PillowWriter(fps = 30, metadata=metadata)
+
+    with writer.saving(fig,"move_rabbit.gif",200):
+    
+      for j in range(len(transitions)):
+
+        for i in range(n_frames):
+            transition = transitions[j]
+            l.set_data(transition[i,0,:],transition[i,1,:])
+            plt.title(f"Iteration {j+1}")
+            writer.grab_frame()
+
+
   def get_coordinates_per_iteration(self):
     k = []
     for rabbit in self.rabbits:
       k.append(rabbit.positions)
     return np.dstack(k)
 
-
-
-  def animate_environment(self):
-    
-    pass
 
   def distances():
     pass
