@@ -7,7 +7,7 @@ from helper import move
 import numpy as np
 
 class Rabbit:
-  def __init__(self,x_min,x_max,y_min,y_max,v_min,v_max,r_min,r_max,start_iteration):
+  def __init__(self,x_min,x_max,y_min,y_max,v_min,v_max,r_min,r_max,start_iteration,n_iterations):
     self.x_min = x_min
     self.x_max = x_max
     self.y_min = y_min
@@ -19,22 +19,28 @@ class Rabbit:
       self.initial_x = randint(x_min,x_max)
       self.initial_y = randint(y_min,y_max)
 
-    self.positions = np.array([[self.initial_x,self.initial_y]])
-    self.max_speed = randint(r_min,r_max)
+    self.max_range = randint(r_min,r_max)
     self.speed = randint(v_min,v_max)
     self.age = 1 # age goes from 1 to 10
+    self.n_iterations = n_iterations
 
-  def move_rabbit(self):
+    self.positions = np.zeros((n_iterations + 1, 2))
+    self.positions[0,0] = self.initial_x
+    self.positions[0,1] = self.initial_y
+    
+
+  def move_rabbit(self,iteration):
     """
-    Takes the last position (x,y) from the array self.positions and based on self.max_speed, 
-    adds a new position to the self.positions array
+    Moves the rabit: takes the values of iteration-1 and adds them some random value
     """
-    x_new = self.positions[-1,0] + randint(-1 * self.max_speed,self.max_speed)
-    y_new = self.positions[-1,1] + randint(-1 * self.max_speed,self.max_speed)
+    
+    x_new = self.positions[iteration-1,0] + randint(-1 * self.speed,self.speed)
+    y_new = self.positions[iteration-1,1] + randint(-1 * self.speed,self.speed)
     while not((self.x_min <= x_new) and (x_new <= self.x_max) and (self.y_min <= y_new) and (y_new <= self.y_max)):
-      x_new = self.positions[-1,0] + randint(-1 * self.max_speed,self.max_speed)
-      y_new = self.positions[-1,1] + randint(-1 * self.max_speed,self.max_speed)
-    self.positions = np.concatenate((self.positions,[[x_new,y_new]]))
+      x_new = self.positions[iteration-1,0] + randint(-1 * self.speed,self.speed)
+      y_new = self.positions[iteration-1,1] + randint(-1 * self.speed,self.speed)
+    self.positions[iteration,0] = x_new
+    self.positions[iteration,1] = y_new
 
   def reproduce(self, other):
     pass
@@ -59,18 +65,27 @@ class Environment:
 
     # Start initial rabbits:
     self.rabbits = []
-    for i in range(self.n_rabbits):
-      self.rabbits.append(Rabbit(self.x_min,self.x_max,self.y_min,self.y_max,self.v_min,self.v_max,self.r_min,self.r_max,1))
+    for _ in range(self.n_rabbits):
+      self.rabbits.append(Rabbit(self.x_min,self.x_max,self.y_min,self.y_max,self.v_min,self.v_max,self.r_min,self.r_max,1,self.n_iterations))
     
-  def execute_environment(self):
+  def execute_environment(self,print_it = False):
     """
     Executes the simulation
     """
-    for _ in range(self.n_iterations):
+    for i in range(1, self.n_iterations + 1):
       for rabbit in self.rabbits:
-        rabbit.move_rabbit()
-    for i in range(len(self.rabbits)):
-      print(f"Rabbit {i}  position: {self.rabbits[i].positions}")
+        rabbit.move_rabbit(i)
+    if print_it:
+      for i in range(len(self.rabbits)):
+        print(f"Rabbit {i}  position: \n{self.rabbits[i].positions}")
+
+  def get_coordinates_per_iteration(self):
+    k = []
+    for rabbit in self.rabbits:
+      k.append(rabbit.positions)
+    return np.dstack(k)
+
+
 
   def animate_environment(self):
     
@@ -78,3 +93,9 @@ class Environment:
 
   def distances():
     pass
+
+  def __str__(self):
+    a = ""
+    for rabbit in self.rabbits:
+      a = a + str(rabbit.positions) + "\n\n"
+    return a

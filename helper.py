@@ -15,10 +15,10 @@ def uniform_line(x0,y0,x1,y1,n_points):
   with 'n_points' number of points in the line that is created from (x0,y0) to (x1,y1)
   (n_points >= 2, initial point and end point are included in the array)
   """
-  k = np.array([[x0,y0]],dtype=float)
+  k = np.zeros((n_points,2))
   dx = (x1-x0)/(n_points-1)
   dy = (y1-y0)/(n_points-1)
-  print(dx,dy)
-  for i in  range(1,n_points):
-    k = np.concatenate((k, [[ x0 + i*dx, y0 + i*dy ]] ))
+  for i in  range(0,n_points):
+    k[i,0] = x0 + i*dx
+    k[i,1] =y0 + i*dy
   return k
